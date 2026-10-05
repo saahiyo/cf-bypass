@@ -10,11 +10,11 @@ const startTest = async () => {
 
         const body = isTurnstile ? {
             mode: 'turnstile',
-            domain: 'https://go.obsidianbots.site',
-            siteKey: '0x4AAAAAACKRmwNSIwTrXOmc'
+            domain: 'https://2captcha.com/demo/cloudflare-turnstile',
+            siteKey: '1x00000000000000000000AA'
         } : {
             mode: 'iuam',
-            domain: 'https://link.get2short.com/links/go'
+            domain: 'https://sayphotobooth.com'
         };
 
         const response = await fetch(API_URL, {
