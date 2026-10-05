@@ -96,7 +96,7 @@ dist
 
 # Gatsby files
 .cache/
-public/
+/public/
 
 # vuepress build output
 .vuepress/dist
@@ -116,3 +116,11 @@ public/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Local agent directories and skills
+.insta/
+.claude/
+.codex/
+.agents/
+skills-lock.json
+

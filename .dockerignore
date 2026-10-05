@@ -1,0 +1,5 @@
+node_modules
+.git
+.insta
+monitor-test.ts
+*.log
