@@ -1,0 +1,1739 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Cloudflare Challenge Solver</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath fill='%23F6821F' d='M36.9 20.3c-.6-4.6-4.5-8.1-9.3-8.1-3.6 0-6.8 2-8.4 5.1-1.3-.8-2.9-1.3-4.6-1.3-4.5 0-8.2 3.5-8.5 8-.1.3-.1.6-.1.9 0 .1 0 .2.1.3-3.6 1.4-6.1 4.9-6.1 9 0 5.4 4.4 9.8 9.8 9.8h27.1c5.5 0 10-4.5 10-10 0-4.9-3.6-9-8.4-9.8-.3-1.3-1-2.7-1.6-3.9z'/%3E%3C/svg%3E" />
+  <style>
+    @font-face {
+      font-family: 'FT Kunst Grotesk';
+      src: url('/fonts/Kunst-Grotesk-Regular.woff2') format('woff2');
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'FT Kunst Grotesk';
+      src: url('/fonts/Kunst-Grotesk-Medium.woff2') format('woff2');
+      font-weight: 500 700;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'Apercu Mono Pro';
+      src: url('/fonts/Apercu-Mono-Pro-Regular.woff2') format('woff2');
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    :root {
+      --bg: #0c0c0c;
+      --panel: #141414;
+      --panel-hover: #181818;
+      --surface: #1a1a1a;
+      --input-bg: #111111;
+      --border: #222222;
+      --border-subtle: #1c1c1c;
+      --border-dashed: rgba(255, 255, 255, 0.12);
+      --cf-orange: #f6821f;
+      --cf-orange-hover: #fa6400;
+      --cf-orange-soft: rgba(246, 130, 31, 0.1);
+      --emerald: #10b981;
+      --rose: #ef4444;
+      --text: #ffffff;
+      --text-muted: #999999;
+      --text-dim: #666666;
+      --sans: "FT Kunst Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --mono: "Apercu Mono Pro", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 14px;
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      position: relative;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* TOP CLOUDFLARE NAVBAR */
+    header.cf-nav {
+      background: rgba(17, 17, 17, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .cf-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+
+    .cf-logo-svg {
+      width: 34px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+
+    .cf-brand-text {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .cf-brand-title {
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      color: #ffffff;
+      text-transform: uppercase;
+    }
+
+    .cf-brand-badge {
+      font-size: 10px;
+      font-weight: 700;
+      background: var(--cf-orange-soft);
+      color: var(--cf-orange);
+      padding: 2px 7px;
+      border-radius: 4px;
+      border: 1px solid rgba(246, 130, 31, 0.25);
+      letter-spacing: 0.5px;
+    }
+
+    .cf-nav-links {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #141414;
+      border: 1px solid var(--border);
+      padding: 3px;
+      border-radius: 999px;
+    }
+
+    .cf-nav-link {
+      background: transparent;
+      border: 0;
+      color: var(--text-muted);
+      font-family: var(--sans);
+      font-size: 12.5px;
+      font-weight: 500;
+      padding: 5px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+      text-decoration: none;
+    }
+    .cf-nav-link:hover {
+      color: #ffffff;
+    }
+    .cf-nav-link.active {
+      background: var(--cf-orange);
+      color: #ffffff;
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(246, 130, 31, 0.3);
+    }
+
+    .cf-page {
+      display: none;
+      width: 100%;
+      flex-direction: column;
+      flex: 1;
+    }
+    .cf-page.active {
+      display: flex;
+    }
+
+    .cf-nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .cf-status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--emerald);
+      box-shadow: 0 0 6px var(--emerald);
+    }
+
+    .btn-cf-orange {
+      background: var(--cf-orange);
+      color: #ffffff;
+      border: 0;
+      font-family: var(--sans);
+      font-size: 12.5px;
+      font-weight: 600;
+      padding: 7px 18px;
+      border-radius: 999px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.15s ease, transform 0.05s ease;
+      text-decoration: none;
+    }
+    .btn-cf-orange:hover {
+      background: var(--cf-orange-hover);
+    }
+    .btn-cf-orange:active {
+      transform: translateY(1px);
+    }
+
+    /* CLOUDFLARE BACKGROUND DOTTED PATTERN & GUIDE LINES (EXACT CLOUDFLARE SPEC) */
+    .cf-bg-decor {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    /* Inner 1200px dashed line boundary */
+    .cf-bg-inner-bounds {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 1200px;
+      height: 100%;
+      pointer-events: none;
+    }
+    .cf-bg-line-1200-left,
+    .cf-bg-line-1200-right {
+      position: absolute;
+      top: 0;
+      height: 100%;
+      width: 1px;
+      background-image: linear-gradient(to bottom, rgba(240, 227, 222, 0.16) 50%, transparent 50%);
+      background-size: 1px 32px;
+      background-repeat: repeat-y;
+    }
+    .cf-bg-line-1200-left { left: 0; }
+    .cf-bg-line-1200-right { right: 0; }
+
+    /* Outer 1480px dot canvas + dashed line boundary */
+    .cf-bg-outer-bounds {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 1480px;
+      height: 100%;
+      pointer-events: none;
+    }
+    .cf-bg-dots-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: radial-gradient(#f0e3de1a 1px, transparent 1px);
+      background-size: 16px 16px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.85) 50%, rgba(0,0,0,0.2) 90%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.85) 50%, rgba(0,0,0,0.2) 90%, transparent 100%);
+    }
+    .cf-bg-line-1480-left,
+    .cf-bg-line-1480-right {
+      position: absolute;
+      top: 0;
+      height: 100%;
+      width: 1px;
+      background-image: linear-gradient(to bottom, rgba(240, 227, 222, 0.12) 50%, transparent 50%);
+      background-size: 1px 32px;
+      background-repeat: repeat-y;
+    }
+    .cf-bg-line-1480-left { left: 0; }
+    .cf-bg-line-1480-right { right: 0; }
+
+    /* CORNER MARKER SQUARE NODES (EXACT 14px WITH -7px OFFSET FROM SCREENSHOT) */
+    .cf-frame-node {
+      position: relative;
+    }
+    .cf-frame-node::before,
+    .cf-frame-node::after {
+      content: "";
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      background: #111111;
+      border-radius: 3px;
+      z-index: 10;
+      pointer-events: none;
+    }
+    .cf-frame-node::before { top: -7px; left: -7px; }
+    .cf-frame-node::after { top: -7px; right: -7px; }
+
+    .cf-corner-bl,
+    .cf-corner-br {
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      background: #111111;
+      border-radius: 3px;
+      z-index: 10;
+      pointer-events: none;
+    }
+    .cf-corner-bl { bottom: -7px; left: -7px; }
+    .cf-corner-br { bottom: -7px; right: -7px; }
+
+    /* ORANGE CROSSHAIR ACCENTS */
+    .cf-crosshair-bracket {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      pointer-events: none;
+      border-color: var(--cf-orange);
+      border-style: solid;
+      z-index: 6;
+    }
+    .cf-crosshair-tl { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
+    .cf-crosshair-tr { top: -1px; right: -1px; border-width: 2px 2px 0 0; }
+    .cf-crosshair-bl { bottom: -1px; left: -1px; border-width: 0 0 2px 2px; }
+    .cf-crosshair-br { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
+
+    /* HERO SECTION */
+    .hero-section {
+      text-align: center;
+      padding: 56px 20px 32px;
+      max-width: 960px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero-title {
+      font-size: 46px;
+      font-weight: 500;
+      letter-spacing: -0.035em;
+      line-height: 1.15;
+      margin-bottom: 14px;
+      color: #ffffff;
+      font-family: var(--sans);
+    }
+
+    .hero-desc {
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      max-width: 700px;
+      margin: 0 auto 32px;
+      font-weight: 400;
+    }
+
+    /* SEGMENTED SWITCHER (FROM SCREENSHOT) */
+    .cf-switcher-wrap {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 34px;
+    }
+
+    .cf-switcher {
+      display: inline-flex;
+      background: #141414;
+      border: 1px solid #242424;
+      padding: 4px;
+      border-radius: 999px;
+      gap: 4px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .cf-switch-btn {
+      background: transparent;
+      border: 0;
+      color: var(--text-muted);
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 500;
+      padding: 7px 18px;
+      border-radius: 999px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+    .cf-switch-btn:hover {
+      color: #ffffff;
+    }
+    .cf-switch-btn.active {
+      background: var(--cf-orange);
+      color: #ffffff;
+      font-weight: 600;
+      box-shadow: 0 2px 10px rgba(246, 130, 31, 0.35);
+    }
+
+    /* THREE-COLUMN VALUE PILLARS (MATCHING SCREENSHOT EXACTLY) */
+    .cf-features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border: 1px solid var(--border);
+      background: #111111;
+      max-width: 1200px;
+      margin: 0 auto 28px;
+      position: relative;
+    }
+    @media (max-width: 840px) {
+      .cf-features-grid { grid-template-columns: 1fr; }
+    }
+    .cf-feature-col {
+      padding: 24px 26px;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      text-align: left;
+      gap: 8px;
+      position: relative;
+    }
+    .cf-feature-col:last-child {
+      border-right: none;
+    }
+    @media (max-width: 840px) {
+      .cf-feature-col { border-right: none; border-bottom: 1px solid var(--border); }
+      .cf-feature-col:last-child { border-bottom: none; }
+    }
+    .cf-feature-icon {
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+    .cf-feature-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #ffffff;
+      letter-spacing: -0.01em;
+    }
+    .cf-feature-desc {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    /* ARCHITECTURE PIPELINE FLOW (FROM SCREENSHOT 1) */
+    .cf-pipeline-card {
+      border: 1px dashed var(--border-dashed);
+      background: rgba(18, 18, 18, 0.6);
+      backdrop-filter: blur(8px);
+      border-radius: 6px;
+      padding: 14px 20px;
+      max-width: 1200px;
+      margin: 0 auto 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 14px;
+      font-size: 12px;
+      position: relative;
+    }
+
+    .pipeline-label {
+      color: var(--text-muted);
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .pipeline-target {
+      color: var(--cf-orange);
+      font-weight: 600;
+    }
+
+    .pipeline-steps {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .pipe-step {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: #171717;
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      border-radius: 4px;
+      color: var(--text-muted);
+      font-size: 11.5px;
+      font-family: var(--mono);
+    }
+    .pipe-step.active {
+      border-color: var(--cf-orange);
+      color: #ffffff;
+      background: var(--cf-orange-soft);
+    }
+    .pipe-arrow {
+      color: var(--text-dim);
+      font-size: 12px;
+    }
+
+    /* MAIN CONTAINER */
+    .cf-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 0 40px;
+      width: 100%;
+      flex: 1;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* METRIC CARDS ROW */
+    .metrics-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 900px) {
+      .metrics-row { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 520px) {
+      .metrics-row { grid-template-columns: 1fr; }
+    }
+
+    .metric-card {
+      background: #141414;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 20px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      position: relative;
+      transition: border-color 0.15s ease, background 0.15s ease;
+    }
+    .metric-card:hover {
+      border-color: rgba(246, 130, 31, 0.4);
+      background: #171717;
+    }
+    .metric-lbl {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      font-weight: 600;
+    }
+    .metric-val {
+      font-size: 28px;
+      font-weight: 500;
+      color: #ffffff;
+      letter-spacing: -0.03em;
+      font-family: var(--sans);
+    }
+    .metric-sub {
+      font-size: 11.5px;
+      color: var(--text-dim);
+    }
+
+    /* FORTUNE 500 STRIP (FROM SCREENSHOT) */
+    .cf-proof-strip {
+      text-align: center;
+      margin: 36px 0 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+    .cf-proof-title {
+      font-size: 28px;
+      font-weight: 500;
+      letter-spacing: -0.03em;
+      color: #ffffff;
+      font-family: var(--sans);
+    }
+    .cf-proof-sub {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: -6px;
+    }
+    .cf-proof-logos {
+      display: inline-flex;
+      align-items: center;
+      background: #141414;
+      border: 1px solid var(--border);
+      padding: 8px 18px;
+      border-radius: 999px;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .proof-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-muted);
+      letter-spacing: -0.01em;
+    }
+    .proof-item svg {
+      opacity: 0.85;
+    }
+
+    /* TWO-COLUMN WORKSPACE */
+    .workspace-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+      gap: 20px;
+      width: 100%;
+    }
+    @media (max-width: 960px) {
+      .workspace-grid { grid-template-columns: minmax(0, 1fr); }
+    }
+
+    /* CARD CONTAINERS */
+    .cf-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      width: 100%;
+    }
+
+    .cf-card-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: #141414;
+    }
+    .cf-card-title {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .cf-card-body {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      flex: 1;
+    }
+
+    /* FORM STYLING */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    input[type="text"], input[type="number"], select, textarea {
+      width: 100%;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      color: #ffffff;
+      font-family: var(--mono);
+      font-size: 13px;
+      padding: 10px 14px;
+      border-radius: 6px;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--cf-orange);
+      box-shadow: 0 0 0 3px var(--cf-orange-soft);
+    }
+    textarea {
+      min-height: 150px;
+      resize: vertical;
+      line-height: 1.45;
+    }
+
+    /* CHIP PRESETS */
+    .chip-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .chip-label {
+      font-size: 11px;
+      color: var(--text-dim);
+      font-weight: 600;
+    }
+    .cf-chip {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 11.5px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.12s ease;
+      font-family: var(--sans);
+    }
+    .cf-chip:hover {
+      border-color: var(--cf-orange);
+      color: #ffffff;
+      background: var(--cf-orange-soft);
+    }
+
+    /* SUBMIT BUTTON */
+    .btn-submit-orange {
+      background: var(--cf-orange);
+      color: #ffffff;
+      border: 0;
+      font-family: var(--sans);
+      font-size: 14px;
+      font-weight: 700;
+      padding: 12px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 0.15s ease, transform 0.05s ease;
+      margin-top: 6px;
+    }
+    .btn-submit-orange:hover {
+      background: var(--cf-orange-hover);
+    }
+    .btn-submit-orange:active {
+      transform: translateY(1px);
+    }
+    .btn-submit-orange:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .form-status-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--text-muted);
+      padding-top: 4px;
+    }
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-weight: 600;
+    }
+    .status-badge.ok { color: var(--emerald); }
+    .status-badge.err { color: var(--rose); }
+    .status-badge.run { color: var(--cf-orange); }
+
+    .cf-spinner {
+      width: 12px;
+      height: 12px;
+      border: 2px solid currentColor;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      display: inline-block;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* CREDENTIAL HIGHLIGHT CARD */
+    .cred-card {
+      background: var(--cf-orange-soft);
+      border: 1px solid rgba(246, 130, 31, 0.35);
+      border-radius: 6px;
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .cred-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--cf-orange);
+    }
+    .cred-box {
+      background: #111111;
+      border: 1px solid rgba(246, 130, 31, 0.2);
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: #ffe6cf;
+      word-break: break-all;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .btn-cred-copy {
+      background: var(--cf-orange);
+      color: #ffffff;
+      border: 0;
+      padding: 3px 9px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.12s ease;
+    }
+    .btn-cred-copy:hover { background: var(--cf-orange-hover); }
+
+    /* CODE & JSON VIEWER WITH SYNTAX HIGHLIGHTING (NO WORD WRAP) */
+    pre.cf-viewer {
+      background: #111111;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 16px;
+      font-family: var(--mono);
+      font-size: 12.5px;
+      line-height: 1.6;
+      max-height: 280px;
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+      display: block;
+      overflow-x: auto;
+      overflow-y: auto;
+      white-space: pre;
+      word-break: normal;
+      word-wrap: normal;
+      color: #d1d5db;
+    }
+    pre.cf-viewer::-webkit-scrollbar { width: 6px; height: 6px; }
+    pre.cf-viewer::-webkit-scrollbar-thumb {
+      background: #2b2b2b;
+      border-radius: 3px;
+    }
+
+    /* SYNTAX HIGHLIGHT COLOR PALETTE (CLOUDFLARE CLOUD PALETTE) */
+    .hl-key { color: #f6821f; font-weight: 500; }             /* CF Orange for object keys */
+    .hl-str { color: #34d399; }                                /* Emerald string values */
+    .hl-num { color: #60a5fa; }                                /* Light blue for numbers */
+    .hl-bool { color: #f472b6; font-weight: 600; }             /* Pink for booleans */
+    .hl-null { color: #9ca3af; font-style: italic; }           /* Gray null */
+    .hl-kw { color: #f6821f; font-weight: 600; }               /* Orange keyword (const, import, return) */
+    .hl-fn { color: #60a5fa; }                                 /* Blue for function names */
+    .hl-comm { color: #6b7280; font-style: italic; }           /* Slate gray for comments */
+    .hl-var { color: #e2e8f0; }                                /* Pure text for variables */
+    .hl-op { color: #94a3b8; }                                 /* Operators */
+
+    /* RIGHT TABS */
+    .cf-pill-tabs {
+      display: flex;
+      gap: 4px;
+    }
+    .cf-pill-tab {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.12s ease;
+    }
+    .cf-pill-tab:hover { color: #ffffff; }
+    .cf-pill-tab.active {
+      color: #ffffff;
+      background: var(--surface);
+      border-color: var(--border);
+    }
+
+    /* LIVE TERMINAL */
+    .cf-terminal {
+      background: #0d0d0d;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 14px;
+      height: 220px;
+      overflow-y: auto;
+      font-family: var(--mono);
+      font-size: 11.5px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .cf-terminal::-webkit-scrollbar { width: 6px; }
+    .cf-terminal::-webkit-scrollbar-thumb { background: #333333; border-radius: 3px; }
+
+    .term-line {
+      display: flex;
+      gap: 8px;
+      line-height: 1.45;
+      word-break: break-all;
+    }
+    .term-ts { color: var(--text-dim); flex-shrink: 0; user-select: none; }
+    .term-msg { color: #aaaaaa; }
+    .term-msg.warn { color: #fbbf24; }
+    .term-msg.err { color: var(--rose); }
+
+    .btn-outline-pill {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.12s ease;
+    }
+    .btn-outline-pill:hover {
+      border-color: var(--cf-orange);
+      color: #ffffff;
+    }
+
+    /* FOOTER */
+    footer.cf-footer {
+      border-top: 1px solid var(--border);
+      padding: 18px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- CLOUDFLARE BACKGROUND DOTTED PATTERN & GUIDE LINES -->
+  <div class="cf-bg-decor" aria-hidden="true">
+    <!-- 1480px canvas for dotted grid & outer hairline guides -->
+    <div class="cf-bg-outer-bounds">
+      <div class="cf-bg-dots-canvas"></div>
+      <div class="cf-bg-line-1480-left"></div>
+      <div class="cf-bg-line-1480-right"></div>
+    </div>
+    <!-- 1200px boundary dashed lines that perfectly align with cards & nodes -->
+    <div class="cf-bg-inner-bounds">
+      <div class="cf-bg-line-1200-left"></div>
+      <div class="cf-bg-line-1200-right"></div>
+    </div>
+  </div>
+
+  <!-- CLOUDFLARE NAVBAR -->
+  <header class="cf-nav">
+    <a href="/" class="cf-brand">
+      <svg class="cf-logo-svg" viewBox="0 0 48 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M37.7 18.2C37.2 13.9 33.5 10.6 29 10.6C25.6 10.6 22.6 12.5 21.1 15.4C19.9 14.6 18.4 14.2 16.8 14.2C12.6 14.2 9.1 17.5 8.9 21.7C8.8 22 8.8 22.3 8.8 22.6C5.4 23.9 3 27.2 3 31C3 36 7.1 40 12.2 40H37.5C42.6 40 46.8 35.8 46.8 30.7C46.8 26.1 43.4 22.3 39 21.5C38.7 20.3 38.1 19.1 37.7 18.2Z" fill="#F6821F"/>
+      </svg>
+      <div class="cf-brand-text">
+        <span class="cf-brand-title">CLOUDFLARE</span>
+        <span class="cf-brand-badge">BYPASS SOLVER</span>
+      </div>
+    </a>
+
+    <!-- TOP LEVEL 2-PAGE NAV SWITCHER -->
+    <nav class="cf-nav-links">
+      <button class="cf-nav-link active" id="nav_tab_landing" onclick="switchPage('landing')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>Overview</span>
+      </button>
+      <button class="cf-nav-link" id="nav_tab_console" onclick="switchPage('console')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+        <span>Raw Processing</span>
+      </button>
+    </nav>
+
+    <div class="cf-nav-actions">
+      <div class="cf-status-pill">
+        <span class="status-dot"></span>
+        <span id="nav_status_text">Operational</span>
+      </div>
+      <div class="cf-status-pill" style="font-family:var(--mono);">
+        <span style="color:var(--text-dim)">up:</span>
+        <span id="nav_uptime" style="color:#ffffff; font-weight:600;">0s</span>
+      </div>
+      <button class="btn-cf-orange" id="btn_copy_base" title="Copy Base API URL">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
+          <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+        </svg>
+        <span id="copy_base_label">Copy API Base</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ==================== PAGE 1: OVERVIEW / LANDING ==================== -->
+  <main id="page_landing" class="cf-page active">
+    <!-- HERO SECTION -->
+    <section class="hero-section">
+      <h1 class="hero-title">Scale predictably</h1>
+      <p class="hero-desc">
+        Enterprise Cloudflare Turnstile CAPTCHA and IUAM clearance solver. High-throughput headless browser engine for automated token generation.
+      </p>
+
+      <div style="display:flex; justify-content:center; gap:12px; margin-bottom:12px;">
+        <button class="btn-cf-orange" onclick="switchPage('console')" style="font-size:13.5px; padding:10px 24px; cursor:pointer;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <span>Open Processing Console</span>
+        </button>
+      </div>
+    </section>
+
+    <div class="cf-container">
+      <!-- THREE-COLUMN VALUE PILLARS (MATCHING OFFICIAL CLOUDFLARE SCREENSHOT) -->
+      <div class="cf-features-grid cf-frame-node">
+        <div class="cf-corner-bl"></div>
+        <div class="cf-corner-br"></div>
+        
+        <!-- Run everywhere -->
+        <div class="cf-feature-col">
+          <span class="cf-feature-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="2" y1="12" x2="22" y2="12"></line>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+            </svg>
+          </span>
+          <h3 class="cf-feature-title">Run everywhere</h3>
+          <p class="cf-feature-desc">Automated bypass clusters deployed across global edge points. Solve Turnstile and IUAM tokens in sub-second roundtrips.</p>
+        </div>
+
+        <!-- Run anywhere -->
+        <div class="cf-feature-col">
+          <span class="cf-feature-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+          </span>
+          <h3 class="cf-feature-title">Run anywhere</h3>
+          <p class="cf-feature-desc">Seamless HTTP and REST integration with cURL, Node.js, and Python. Optimized routing for minimal challenge clearance latency.</p>
+        </div>
+
+        <!-- Run at massive scale -->
+        <div class="cf-feature-col">
+          <span class="cf-feature-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="7" height="7"></rect>
+              <rect x="14" y="3" width="7" height="7"></rect>
+              <rect x="14" y="14" width="7" height="7"></rect>
+              <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+          </span>
+          <h3 class="cf-feature-title">Run at massive scale</h3>
+          <p class="cf-feature-desc">Concurrent headless Puppeteer sessions with auto memory cycling. Zero capacity planning required.</p>
+        </div>
+      </div>
+
+      <!-- ARCHITECTURAL PIPELINE (FROM SCREENSHOT 1) -->
+      <div class="cf-pipeline-card">
+        <div class="cf-crosshair-bracket cf-crosshair-tl"></div>
+        <div class="cf-crosshair-bracket cf-crosshair-tr"></div>
+        <div class="cf-crosshair-bracket cf-crosshair-bl"></div>
+        <div class="cf-crosshair-bracket cf-crosshair-br"></div>
+        <div class="pipeline-label">
+          <span>Execution pipeline:</span>
+          <span class="pipeline-target" id="pipe_current_target">Turnstile Verification</span>
+        </div>
+
+        <div class="pipeline-steps">
+          <span class="pipe-step active">
+            <span>01</span> Worker Request
+          </span>
+          <span class="pipe-arrow">&rarr;</span>
+          <span class="pipe-step active">
+            <span>02</span> Headless Browser
+          </span>
+          <span class="pipe-arrow">&rarr;</span>
+          <span class="pipe-step active" id="pipe_step_mode">
+            <span>03</span> Turnstile Widget
+          </span>
+          <span class="pipe-arrow">&rarr;</span>
+          <span class="pipe-step active">
+            <span>04</span> Token Extracted
+          </span>
+        </div>
+      </div>
+
+      <!-- METRICS CARDS (FROM SCREENSHOT 1 & 2) -->
+      <div class="metrics-row">
+        <div class="metric-card">
+          <span class="metric-lbl">Total Solved</span>
+          <span class="metric-val" id="m_solved">0</span>
+          <span class="metric-sub">turnstile challenges cleared</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-lbl">Average Latency</span>
+          <span class="metric-val" id="m_latency">—</span>
+          <span class="metric-sub">end-to-end execution</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-lbl">Success Rate</span>
+          <span class="metric-val" id="m_success">100%</span>
+          <span class="metric-sub">sla reliability</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-lbl">Browser Cluster</span>
+          <span class="metric-val" id="m_browser_state" style="color:var(--emerald)">Ready</span>
+          <span class="metric-sub">puppeteer-core runtime</span>
+        </div>
+      </div>
+
+      <!-- CLOUDFLARE SOCIAL PROOF (MATCHING SCREENSHOT EXACTLY) -->
+      <div class="cf-proof-strip">
+        <h2 class="cf-proof-title">Cloudflare powers 45% of the Fortune 500</h2>
+        <p class="cf-proof-sub">Trusted by the teams you trust.</p>
+        <div class="cf-proof-logos">
+          <span class="proof-item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/></svg>
+            People
+          </span>
+          <span class="proof-item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            Shopify
+          </span>
+          <span class="proof-item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 10h6"/><path d="M12 14h3"/></svg>
+            Character.AI
+          </span>
+          <span class="proof-item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            Intercom
+          </span>
+          <span class="proof-item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/></svg>
+            DoorDash
+          </span>
+          <span class="proof-item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9 12a3 3 0 1 0 6 0 3 3 0 0 0-6 0"/></svg>
+            Discord
+          </span>
+          <span class="proof-item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/></svg>
+            Zendesk
+          </span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ==================== PAGE 2: RAW PROCESSING CONSOLE ==================== -->
+  <main id="page_console" class="cf-page">
+    <div class="cf-container" style="padding-top:28px;">
+      <!-- SIGNATURE CLOUDFLARE PILL SWITCHER -->
+      <div class="cf-switcher-wrap">
+        <div class="cf-switcher">
+          <button class="cf-switch-btn active" id="btn_mode_turnstile" onclick="selectMode('turnstile')">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <span>Turnstile Solver</span>
+          </button>
+          <button class="cf-switch-btn" id="btn_mode_iuam" onclick="selectMode('iuam')">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            <span>IUAM Bypass</span>
+          </button>
+          <button class="cf-switch-btn" id="btn_mode_raw" onclick="selectMode('raw')">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <span>Raw Payload</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- WORKSPACE 2-COLUMN GRID -->
+      <div class="workspace-grid">
+      <!-- LEFT: CONFIGURATION & PARAMETERS -->
+      <section class="cf-card">
+        <div class="cf-card-header">
+          <span class="cf-card-title">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            Request Parameters
+          </span>
+          <span id="route_badge" style="font-size:11px; font-family:var(--mono); color:var(--text-muted)">POST /cloudflare</span>
+        </div>
+
+        <div class="cf-card-body">
+          <!-- FORM: TURNSTILE -->
+          <div id="pane_turnstile" class="cf-mode-pane">
+            <div class="form-group">
+              <label class="form-label">Target Domain / Origin</label>
+              <input type="text" id="t_domain" value="https://example.com" spellcheck="false" />
+            </div>
+
+            <div class="form-group" style="margin-top:12px;">
+              <label class="form-label">Turnstile SiteKey</label>
+              <input type="text" id="t_key" value="1x00000000000000000000AA" spellcheck="false" />
+            </div>
+
+            <div class="form-group" style="margin-top:12px;">
+              <label class="form-label">Timeout (seconds)</label>
+              <input type="number" id="t_timeout" value="45" min="5" max="180" />
+            </div>
+
+            <div class="chip-row" style="margin-top:14px;">
+              <span class="chip-label">Presets:</span>
+              <button class="cf-chip" onclick="setTurnstilePreset('https://example.com', '1x00000000000000000000AA')">CF Always Pass</button>
+              <button class="cf-chip" onclick="setTurnstilePreset('https://example.com', '3x00000000000000000000FF')">CF Interactive</button>
+              <button class="cf-chip" onclick="setTurnstilePreset('https://2captcha.com/demo/cloudflare-turnstile', '1x00000000000000000000AA')">2captcha Demo</button>
+            </div>
+          </div>
+
+          <!-- FORM: IUAM -->
+          <div id="pane_iuam" class="cf-mode-pane" style="display:none;">
+            <div class="form-group">
+              <label class="form-label">Target Protected Domain / URL</label>
+              <input type="text" id="i_domain" value="https://sayphotobooth.com" spellcheck="false" />
+            </div>
+
+            <div class="form-group" style="margin-top:12px;">
+              <label class="form-label">Timeout (seconds)</label>
+              <input type="number" id="i_timeout" value="60" min="5" max="180" />
+            </div>
+
+            <div class="chip-row" style="margin-top:14px;">
+              <span class="chip-label">Presets:</span>
+              <button class="cf-chip" onclick="document.getElementById('i_domain').value='https://sayphotobooth.com'">sayphotobooth.com</button>
+              <button class="cf-chip" onclick="document.getElementById('i_domain').value='https://odiadance.com'">odiadance.com</button>
+            </div>
+          </div>
+
+          <!-- FORM: RAW JSON -->
+          <div id="pane_raw" class="cf-mode-pane" style="display:none;">
+            <div class="form-group">
+              <label class="form-label">Endpoint Route</label>
+              <select id="raw_endpoint">
+                <option value="/cloudflare">POST /cloudflare</option>
+                <option value="/solve">POST /solve</option>
+                <option value="/solve-challenge">POST /solve-challenge</option>
+              </select>
+            </div>
+
+            <div class="form-group" style="margin-top:12px;">
+              <label class="form-label">Payload JSON</label>
+              <textarea id="raw_body" spellcheck="false">{
+  "mode": "turnstile",
+  "domain": "https://example.com",
+  "siteKey": "1x00000000000000000000AA"
+}</textarea>
+            </div>
+          </div>
+
+          <!-- SUBMIT ACTION -->
+          <button class="btn-submit-orange" id="btn_run" onclick="executeSolver()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            <span>Execute Solver</span>
+          </button>
+
+          <div class="form-status-bar">
+            <span class="status-badge" id="form_status">Ready</span>
+            <span style="font-size:11px; color:var(--text-dim);">Shortcut: Ctrl + Enter</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT: RESPONSE & TELEMETRY -->
+      <section style="display:flex; flex-direction:column; gap:20px; min-width:0; width:100%;">
+        <!-- RESPONSE CARD -->
+        <div class="cf-card" style="flex:1; min-width:0;">
+          <div class="cf-card-header">
+            <div class="cf-pill-tabs">
+              <button class="cf-pill-tab active" id="tab_res" onclick="selectRightTab('res')">Response</button>
+              <button class="cf-pill-tab" id="tab_curl" onclick="selectRightTab('curl')">cURL</button>
+              <button class="cf-pill-tab" id="tab_node" onclick="selectRightTab('node')">Node.js</button>
+              <button class="cf-pill-tab" id="tab_python" onclick="selectRightTab('python')">Python</button>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span id="elapsed_tag" style="font-size:11px; font-family:var(--mono); color:var(--text-muted)">time: —</span>
+              <button class="btn-outline-pill" onclick="copyCurrentViewer()">Copy</button>
+            </div>
+          </div>
+
+          <div class="cf-card-body" style="padding:16px;">
+            <!-- CREDENTIAL QUICK-CARD (SHOWN ON SUCCESS) -->
+            <div id="cred_card" class="cred-card" style="display:none;">
+              <div class="cred-title-row">
+                <span id="cred_type_title">Turnstile Token Extracted</span>
+                <span id="cred_time_text">1.68s</span>
+              </div>
+              <div class="cred-box">
+                <span id="cred_text" style="overflow:hidden; text-overflow:ellipsis;">—</span>
+                <button class="btn-cred-copy" onclick="copyCredValue()">Copy</button>
+              </div>
+            </div>
+
+            <!-- CODE / RESULT VIEWER -->
+            <pre class="cf-viewer" id="cf_viewer">// Submit a challenge request to inspect live result payload...</pre>
+          </div>
+        </div>
+
+        <!-- LIVE TERMINAL ACTIVITY -->
+        <div class="cf-card">
+          <div class="cf-card-header">
+            <span class="cf-card-title">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+              Execution Activity Log
+            </span>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <label style="font-size:11px; color:var(--text-muted); display:flex; align-items:center; gap:4px; cursor:pointer;">
+                <input type="checkbox" id="chk_scroll" checked style="accent-color:var(--cf-orange);"> auto-scroll
+              </label>
+              <button class="btn-outline-pill" onclick="clearTerminal()">Clear</button>
+            </div>
+          </div>
+
+          <div class="cf-card-body" style="padding:12px;">
+            <div class="cf-terminal" id="cf_terminal">
+              <div class="term-line">
+                <span class="term-ts">[Init]</span>
+                <span class="term-msg">Connected to Cloudflare Solver Engine. Ready for incoming requests.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+  </main>
+
+  <!-- CLOUDFLARE FOOTER -->
+  <footer class="cf-footer">
+    <div>
+      <span>&copy; 2026 Cloudflare Bypass Engine &middot; Hybrid Chromium Architecture</span>
+    </div>
+    <div>
+      <span id="ft_browser_runtime" style="font-family:var(--mono);">Runtime: Chromium / Puppeteer-Core</span>
+    </div>
+  </footer>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const BASE = `${location.protocol}//${location.host}`;
+
+    let currentPage = 'landing';
+    function switchPage(page) {
+      currentPage = page;
+      $('page_landing').classList.toggle('active', page === 'landing');
+      $('page_console').classList.toggle('active', page === 'console');
+      $('nav_tab_landing').classList.toggle('active', page === 'landing');
+      $('nav_tab_console').classList.toggle('active', page === 'console');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    let activeMode = 'turnstile';
+    let activeRightTab = 'res';
+    let latestResponse = null;
+
+    // KEYBOARD SHORTCUT: Ctrl + Enter
+    window.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        executeSolver();
+      }
+    });
+
+    // MODE SWITCHING
+    function selectMode(mode) {
+      activeMode = mode;
+      $('btn_mode_turnstile').classList.toggle('active', mode === 'turnstile');
+      $('btn_mode_iuam').classList.toggle('active', mode === 'iuam');
+      $('btn_mode_raw').classList.toggle('active', mode === 'raw');
+
+      $('pane_turnstile').style.display = mode === 'turnstile' ? 'block' : 'none';
+      $('pane_iuam').style.display = mode === 'iuam' ? 'block' : 'none';
+      $('pane_raw').style.display = mode === 'raw' ? 'block' : 'none';
+
+      const pipeTarget = $('pipe_current_target');
+      const pipeStep = $('pipe_step_mode');
+      if (mode === 'turnstile') {
+        pipeTarget.textContent = 'Turnstile Verification';
+        pipeStep.innerHTML = '<span>03</span> Turnstile Widget';
+        $('route_badge').textContent = 'POST /cloudflare';
+      } else if (mode === 'iuam') {
+        pipeTarget.textContent = 'Cloudflare IUAM 5s Bypass';
+        pipeStep.innerHTML = '<span>03</span> IUAM Challenge';
+        $('route_badge').textContent = 'POST /cloudflare';
+      } else {
+        pipeTarget.textContent = 'Custom Payload';
+        pipeStep.innerHTML = '<span>03</span> Custom Pipeline';
+        $('route_badge').textContent = $('raw_endpoint').value;
+      }
+
+      if (activeRightTab !== 'res') renderSnippet();
+    }
+
+    function setTurnstilePreset(dom, key) {
+      $('t_domain').value = dom;
+      $('t_key').value = key;
+      if (activeRightTab !== 'res') renderSnippet();
+    }
+
+    $('raw_endpoint')?.addEventListener('change', () => {
+      $('route_badge').textContent = $('raw_endpoint').value;
+      if (activeRightTab !== 'res') renderSnippet();
+    });
+
+    function getPayload() {
+      if (activeMode === 'turnstile') {
+        return {
+          endpoint: '/cloudflare',
+          body: {
+            mode: 'turnstile',
+            domain: $('t_domain').value.trim(),
+            siteKey: $('t_key').value.trim(),
+            timeOut: (parseInt($('t_timeout').value) || 45) * 1000
+          }
+        };
+      }
+      if (activeMode === 'iuam') {
+        return {
+          endpoint: '/cloudflare',
+          body: {
+            mode: 'iuam',
+            domain: $('i_domain').value.trim(),
+            timeOut: (parseInt($('i_timeout').value) || 60) * 1000
+          }
+        };
+      }
+      let body;
+      try { body = JSON.parse($('raw_body').value); } catch { body = {}; }
+      return {
+        endpoint: $('raw_endpoint').value,
+        body
+      };
+    }
+
+    // EXECUTION
+    async function executeSolver() {
+      const { endpoint, body } = getPayload();
+      const statusEl = $('form_status');
+      const btn = $('btn_run');
+
+      if (activeMode === 'turnstile' && (!body.domain || !body.siteKey)) {
+        statusEl.className = 'status-badge err';
+        statusEl.textContent = 'Domain and SiteKey are required';
+        return;
+      }
+      if (activeMode === 'iuam' && !body.domain) {
+        statusEl.className = 'status-badge err';
+        statusEl.textContent = 'Target domain is required';
+        return;
+      }
+
+      btn.disabled = true;
+      statusEl.className = 'status-badge run';
+      statusEl.innerHTML = '<span class="cf-spinner"></span> Solving challenge...';
+
+      const t0 = performance.now();
+      try {
+        const res = await fetch(BASE + endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+
+        const ct = res.headers.get('content-type') || '';
+        const data = ct.includes('json') ? await res.json() : await res.text();
+        const duration = performance.now() - t0;
+        latestResponse = data;
+
+        const isOk = res.ok && (!data.code || data.code === 200) && data.success !== false;
+        statusEl.className = isOk ? 'status-badge ok' : 'status-badge err';
+        statusEl.textContent = isOk ? `Completed (${data.elapsed || ((duration/1000).toFixed(2) + 's')})` : `Failed (${data.code || res.status})`;
+
+        $('elapsed_tag').textContent = `time: ${data.elapsed || ((duration/1000).toFixed(2) + 's')}`;
+
+        // Populate extracted credential card
+        const credCard = $('cred_card');
+        if (data.token) {
+          credCard.style.display = 'flex';
+          $('cred_type_title').textContent = 'Turnstile Token Extracted';
+          $('cred_time_text').textContent = data.elapsed || '';
+          $('cred_text').textContent = data.token;
+        } else if (data.cf_clearance) {
+          credCard.style.display = 'flex';
+          $('cred_type_title').textContent = 'cf_clearance Cookie Cleared';
+          $('cred_time_text').textContent = data.elapsed || '';
+          $('cred_text').textContent = data.cf_clearance;
+        } else {
+          credCard.style.display = 'none';
+        }
+
+        renderViewer();
+        fetchStats();
+      } catch (err) {
+        statusEl.className = 'status-badge err';
+        statusEl.textContent = 'Network error';
+        $('cf_viewer').textContent = String(err);
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    // RIGHT TABS (Response, cURL, Node, Python)
+    function selectRightTab(tab) {
+      activeRightTab = tab;
+      ['res', 'curl', 'node', 'python'].forEach(t => {
+        $(`tab_${t}`)?.classList.toggle('active', t === tab);
+      });
+      renderViewer();
+    }
+
+    // SYNTAX HIGHLIGHTING ENGINE
+    function highlightJson(json) {
+      if (typeof json !== 'string') {
+        json = JSON.stringify(json, null, 2);
+      }
+      return json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(
+        /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
+        function (match) {
+          let cls = 'hl-num';
+          if (/^"/.test(match)) {
+            if (/:$/.test(match)) {
+              cls = 'hl-key';
+            } else {
+              cls = 'hl-str';
+            }
+          } else if (/true|false/.test(match)) {
+            cls = 'hl-bool';
+          } else if (/null/.test(match)) {
+            cls = 'hl-null';
+          }
+          return `<span class="${cls}">${match}</span>`;
+        }
+      );
+    }
+
+    function highlightCurl(code) {
+      const parts = [];
+      let i = 0;
+      // Extract strings first to protect them from keyword replacement
+      const strRegex = /("https?:\/\/[^"]*"|'\{.*?\}'|"[^"]*")/gs;
+      let text = code.replace(strRegex, (match) => {
+        const id = `___STR_${parts.length}___`;
+        parts.push(`<span class="hl-str">${escapeHtml(match)}</span>`);
+        return id;
+      });
+
+      let res = escapeHtml(text)
+        .replace(/\b(curl)\b/g, '<span class="hl-kw">curl</span>')
+        .replace(/(-X|-H|-d)\b/g, '<span class="hl-fn">$1</span>');
+
+      parts.forEach((p, idx) => {
+        res = res.replace(`___STR_${idx}___`, p);
+      });
+      return res;
+    }
+
+    function highlightJs(code) {
+      const parts = [];
+      const strRegex = /(".*?"|'.*?'|`.*?`)/g;
+      let text = code.replace(strRegex, (match) => {
+        const id = `___STR_${parts.length}___`;
+        parts.push(`<span class="hl-str">${escapeHtml(match)}</span>`);
+        return id;
+      });
+
+      let res = escapeHtml(text)
+        .replace(/\b(const|let|var|await|async|return|import|from)\b/g, '<span class="hl-kw">$1</span>')
+        .replace(/\b(fetch|console\.log|JSON\.stringify|json)\b/g, '<span class="hl-fn">$1</span>')
+        .replace(/\b(true|false|null)\b/g, '<span class="hl-bool">$1</span>')
+        .replace(/\b(\d+)\b/g, '<span class="hl-num">$1</span>');
+
+      parts.forEach((p, idx) => {
+        res = res.replace(`___STR_${idx}___`, p);
+      });
+      return res;
+    }
+
+    function highlightPython(code) {
+      const parts = [];
+      const strRegex = /(".*?"|'.*?')/g;
+      let text = code.replace(strRegex, (match) => {
+        const id = `___STR_${parts.length}___`;
+        parts.push(`<span class="hl-str">${escapeHtml(match)}</span>`);
+        return id;
+      });
+
+      let res = escapeHtml(text)
+        .replace(/\b(import|as|from|def|return)\b/g, '<span class="hl-kw">$1</span>')
+        .replace(/\b(requests\.post|print|json)\b/g, '<span class="hl-fn">$1</span>')
+        .replace(/\b(True|False|None)\b/g, '<span class="hl-bool">$1</span>')
+        .replace(/\b(\d+)\b/g, '<span class="hl-num">$1</span>');
+
+      parts.forEach((p, idx) => {
+        res = res.replace(`___STR_${idx}___`, p);
+      });
+      return res;
+    }
+
+    function renderViewer() {
+      const viewer = $('cf_viewer');
+      if (activeRightTab === 'res') {
+        if (!latestResponse) {
+          viewer.innerHTML = '<span class="hl-comm">// Submit a challenge request to inspect live result payload...</span>';
+          return;
+        }
+        viewer.innerHTML = highlightJson(latestResponse);
+        return;
+      }
+      renderSnippet();
+    }
+
+    function renderSnippet() {
+      const viewer = $('cf_viewer');
+      const { endpoint, body } = getPayload();
+      const url = BASE + endpoint;
+      const compactJson = JSON.stringify(body);
+      const prettyJson = JSON.stringify(body, null, 2);
+
+      if (activeRightTab === 'curl') {
+        const raw = `curl -X POST "${url}" \\\n  -H "Content-Type: application/json" \\\n  -d '${compactJson}'`;
+        viewer.innerHTML = highlightCurl(raw);
+      } else if (activeRightTab === 'node') {
+        const raw = `const res = await fetch("${url}", {\n  method: "POST",\n  headers: { "Content-Type": "application/json" },\n  body: JSON.stringify(${prettyJson})\n});\nconst data = await res.json();\nconsole.log(data);`;
+        viewer.innerHTML = highlightJs(raw);
+      } else if (activeRightTab === 'python') {
+        const pyJson = prettyJson.replace(/: true/g, ': True').replace(/: false/g, ': False');
+        const raw = `import requests\n\nres = requests.post(\n    "${url}",\n    json=${pyJson},\n    timeout=60\n)\nprint(res.json())`;
+        viewer.innerHTML = highlightPython(raw);
+      }
+    }
+
+    function copyCurrentViewer() {
+      navigator.clipboard.writeText($('cf_viewer').textContent).then(() => {
+        alert('Copied to clipboard');
+      });
+    }
+
+    function copyCredValue() {
+      navigator.clipboard.writeText($('cred_text').textContent).then(() => {
+        alert('Credential copied');
+      });
+    }
+
+    // COPY BASE URL
+    $('btn_copy_base').onclick = () => {
+      navigator.clipboard.writeText(BASE).then(() => {
+        const label = $('copy_base_label');
+        label.textContent = 'Copied!';
+        setTimeout(() => { label.textContent = 'Copy API Base'; }, 1500);
+      });
+    };
+
+    // STATS POLLING
+    function fmtUptime(s) {
+      s = Math.floor(s || 0);
+      if (s < 60) return `${s}s`;
+      if (s < 3600) return `${Math.floor(s/60)}m ${s%60}s`;
+      return `${Math.floor(s/3600)}h ${Math.floor((s%3600)/60)}m`;
+    }
+
+    async function fetchStats() {
+      try {
+        const res = await fetch(BASE + '/stats', { cache: 'no-store' });
+        if (!res.ok) return;
+        const s = await res.json();
+
+        $('nav_uptime').textContent = fmtUptime(s.uptime);
+        $('m_solved').textContent = s.solved || 0;
+        $('m_latency').textContent = s.latency_ms?.avg ? `${(s.latency_ms.avg / 1000).toFixed(2)}s` : '—';
+        $('m_success').textContent = s.total_requests ? `${s.success_rate}%` : '100%';
+
+        const isReady = !!s.browser_ready;
+        $('nav_status_text').textContent = isReady ? 'Operational' : 'Starting...';
+        $('m_browser_state').textContent = isReady ? 'Ready' : 'Starting...';
+        $('m_browser_state').style.color = isReady ? 'var(--emerald)' : 'var(--cf-orange)';
+        $('ft_browser_runtime').textContent = `Runtime: Chromium / Puppeteer-Core (${isReady ? 'Connected' : 'Launching'})`;
+      } catch (_) {}
+    }
+
+    // LIVE LOG STREAM
+    async function fetchLogs() {
+      try {
+        const res = await fetch(BASE + '/api/logs');
+        if (!res.ok) return;
+        const data = await res.json();
+        const terminal = $('cf_terminal');
+
+        if (Array.isArray(data.logs)) {
+          terminal.innerHTML = data.logs.map(l => {
+            const cls = l.level === 'error' ? 'err' : (l.level === 'warn' ? 'warn' : '');
+            return `<div class="term-line"><span class="term-ts">[${l.time}]</span><span class="term-msg ${cls}">${escapeHtml(l.message)}</span></div>`;
+          }).join('');
+
+          if ($('chk_scroll').checked) {
+            terminal.scrollTop = terminal.scrollHeight;
+          }
+        }
+      } catch (_) {}
+    }
+
+    function clearTerminal() {
+      $('cf_terminal').innerHTML = '';
+      fetch(BASE + '/api/logs', { method: 'DELETE' }).catch(() => {});
+    }
+
+    function escapeHtml(str) {
+      return String(str || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+
+    // AUTO-UPDATE CODE SNIPPETS
+    ['t_domain', 't_key', 't_timeout', 'i_domain', 'i_timeout', 'raw_endpoint', 'raw_body'].forEach(id => {
+      $(id)?.addEventListener('input', () => { if (activeRightTab !== 'res') renderSnippet(); });
+    });
+
+    // STARTUP
+    fetchStats();
+    fetchLogs();
+    setInterval(fetchStats, 3000);
+    setInterval(fetchLogs, 2500);
+  </script>
+</body>
+</html>
