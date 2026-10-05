@@ -1,6 +1,10 @@
-# ⚡ cf-bypass: High-Performance Cloudflare & Turnstile Solver
+# 🛡️ cf-bypass: High-Performance Cloudflare & Turnstile Solver
 
 A lightning-fast, stealthy API and Web Dashboard for bypassing Cloudflare bot protections—including **Turnstile** (Managed/Interactive Captchas) and **IUAM** (I'm Under Attack Mode / "Checking your browser" clearance). Built on **Bun**, **Rebrowser-Puppeteer**, and **Express**.
+
+<p align="center">
+  <img src="assets/dashboard.png" alt="cf-bypass Overview Dashboard" width="100%">
+</p>
 
 ---
 
@@ -68,6 +72,10 @@ The service exposes a built-in Cloudflare-inspired dashboard at `/`:
 
 - **Overview Page:** Real-time health telemetry, average and P95 latency monitors, success rate graphs, and visual architecture breakdown.
 - **Raw Processing Page:** Live testing playground for Turnstile and IUAM modes with preset test targets, custom parameters, JSON syntax-highlighted responses, token copy, and live streaming runtime logs.
+
+<p align="center">
+  <img src="assets/raw-processing.png" alt="cf-bypass Raw Processing Playground" width="100%">
+</p>
 
 ---
 
