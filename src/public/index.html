@@ -71,10 +71,11 @@
       background: rgba(17, 17, 17, 0.95);
       backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
-      padding: 14px 28px;
+      padding: 12px clamp(12px, 3vw, 28px);
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 12px;
       position: sticky;
       top: 0;
       z-index: 100;
@@ -83,13 +84,14 @@
     .cf-brand {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       text-decoration: none;
+      flex-shrink: 0;
     }
 
     .cf-logo-svg {
-      width: 34px;
-      height: 24px;
+      width: 32px;
+      height: 22px;
       flex-shrink: 0;
     }
 
@@ -100,28 +102,30 @@
     }
 
     .cf-brand-title {
-      font-size: 15px;
+      font-size: 14.5px;
       font-weight: 800;
-      letter-spacing: 1px;
+      letter-spacing: 0.8px;
       color: #ffffff;
       text-transform: uppercase;
+      white-space: nowrap;
     }
 
     .cf-brand-badge {
-      font-size: 10px;
+      font-size: 9.5px;
       font-weight: 700;
       background: var(--cf-orange-soft);
       color: var(--cf-orange);
-      padding: 2px 7px;
+      padding: 2px 6px;
       border-radius: 4px;
       border: 1px solid rgba(246, 130, 31, 0.25);
       letter-spacing: 0.5px;
+      white-space: nowrap;
     }
 
     .cf-nav-links {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
       background: #141414;
       border: 1px solid var(--border);
       padding: 3px;
@@ -143,6 +147,7 @@
       gap: 6px;
       transition: all 0.15s ease;
       text-decoration: none;
+      white-space: nowrap;
     }
     .cf-nav-link:hover {
       color: #ffffff;
@@ -167,19 +172,21 @@
     .cf-nav-actions {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
+      flex-shrink: 0;
     }
 
     .cf-status-pill {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 5px 12px;
+      padding: 5px 11px;
       border-radius: 999px;
       border: 1px solid var(--border);
       background: var(--panel);
-      font-size: 12px;
+      font-size: 11.5px;
       color: var(--text-muted);
+      white-space: nowrap;
     }
     .status-dot {
       width: 7px;
@@ -332,15 +339,16 @@
     /* HERO SECTION */
     .hero-section {
       text-align: center;
-      padding: 56px 20px 32px;
+      padding: clamp(36px, 6vw, 56px) clamp(16px, 4vw, 24px) 28px;
       max-width: 960px;
+      width: 100%;
       margin: 0 auto;
       position: relative;
       z-index: 2;
     }
 
     .hero-title {
-      font-size: 46px;
+      font-size: clamp(28px, 6vw, 46px);
       font-weight: 500;
       letter-spacing: -0.035em;
       line-height: 1.15;
@@ -350,11 +358,11 @@
     }
 
     .hero-desc {
-      font-size: 15px;
+      font-size: clamp(13.5px, 2.2vw, 15px);
       color: var(--text-muted);
       line-height: 1.6;
       max-width: 700px;
-      margin: 0 auto 32px;
+      margin: 0 auto 28px;
       font-weight: 400;
     }
 
@@ -362,7 +370,8 @@
     .cf-switcher-wrap {
       display: flex;
       justify-content: center;
-      margin-bottom: 34px;
+      margin-bottom: 30px;
+      width: 100%;
     }
 
     .cf-switcher {
@@ -373,6 +382,7 @@
       border-radius: 999px;
       gap: 4px;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      max-width: 100%;
     }
 
     .cf-switch-btn {
@@ -390,6 +400,7 @@
       gap: 7px;
       transition: all 0.15s ease;
       user-select: none;
+      white-space: nowrap;
     }
     .cf-switch-btn:hover {
       color: #ffffff;
@@ -400,6 +411,12 @@
       font-weight: 600;
       box-shadow: 0 2px 10px rgba(246, 130, 31, 0.35);
     }
+    .sw-txt-short {
+      display: none;
+    }
+    .sw-txt-full {
+      display: inline;
+    }
 
     /* THREE-COLUMN VALUE PILLARS (MATCHING SCREENSHOT EXACTLY) */
     .cf-features-grid {
@@ -408,11 +425,9 @@
       border: 1px solid var(--border);
       background: #111111;
       max-width: 1200px;
+      width: 100%;
       margin: 0 auto 28px;
       position: relative;
-    }
-    @media (max-width: 840px) {
-      .cf-features-grid { grid-template-columns: 1fr; }
     }
     .cf-feature-col {
       padding: 24px 26px;
@@ -426,10 +441,6 @@
     }
     .cf-feature-col:last-child {
       border-right: none;
-    }
-    @media (max-width: 840px) {
-      .cf-feature-col { border-right: none; border-bottom: 1px solid var(--border); }
-      .cf-feature-col:last-child { border-bottom: none; }
     }
     .cf-feature-icon {
       color: var(--text-muted);
@@ -509,7 +520,7 @@
     .cf-container {
       max-width: 1200px;
       margin: 0 auto;
-      padding: 0 0 40px;
+      padding: 0 clamp(14px, 3.5vw, 24px) 40px;
       width: 100%;
       flex: 1;
       position: relative;
@@ -522,12 +533,7 @@
       grid-template-columns: repeat(4, 1fr);
       gap: 16px;
       margin-bottom: 24px;
-    }
-    @media (max-width: 900px) {
-      .metrics-row { grid-template-columns: repeat(2, 1fr); }
-    }
-    @media (max-width: 520px) {
-      .metrics-row { grid-template-columns: 1fr; }
+      width: 100%;
     }
 
     .metric-card {
@@ -949,6 +955,271 @@
       font-size: 12px;
       color: var(--text-dim);
     }
+
+    /* =========================================================
+       RESPONSIVE BREAKPOINTS (DESKTOP, LAPTOP, TABLET, MOBILE)
+       ========================================================= */
+
+    /* TABLET LANDSCAPE & COMPACT LAPTOP (<= 1240px) */
+    @media (max-width: 1240px) {
+      .cf-bg-inner-bounds {
+        width: calc(100% - clamp(28px, 4vw, 48px));
+      }
+      .cf-bg-line-1480-left,
+      .cf-bg-line-1480-right {
+        display: none;
+      }
+    }
+
+    /* TABLET PORTRAIT (<= 960px) */
+    @media (max-width: 960px) {
+      header.cf-nav {
+        padding: 10px 18px;
+      }
+      .cf-uptime-pill {
+        display: none !important;
+      }
+      .workspace-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 18px;
+      }
+      .metrics-row {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+      .cf-features-grid {
+        grid-template-columns: 1fr;
+      }
+      .cf-feature-col {
+        border-right: none !important;
+        border-bottom: 1px solid var(--border);
+        padding: 20px 22px;
+      }
+      .cf-feature-col:last-child {
+        border-bottom: none;
+      }
+      /* Keep corner nodes strictly within container */
+      .cf-frame-node::before { left: -1px; top: -1px; }
+      .cf-frame-node::after { right: -1px; top: -1px; }
+      .cf-corner-bl { left: -1px; bottom: -1px; }
+      .cf-corner-br { right: -1px; bottom: -1px; }
+    }
+
+    /* COMPACT TABLET / MOBILE LANDSCAPE (<= 768px) */
+    @media (max-width: 768px) {
+      header.cf-nav {
+        flex-wrap: wrap;
+        padding: 10px 14px;
+        gap: 10px;
+      }
+      .cf-brand {
+        order: 1;
+      }
+      .cf-nav-actions {
+        order: 2;
+        gap: 8px;
+      }
+      .cf-nav-links {
+        order: 3;
+        width: 100%;
+        justify-content: center;
+        margin-top: 2px;
+        padding: 4px;
+      }
+      .cf-nav-link {
+        flex: 1;
+        justify-content: center;
+        text-align: center;
+        padding: 7px 12px;
+        font-size: 12.5px;
+      }
+      .cf-brand-badge {
+        display: none;
+      }
+      #copy_base_label {
+        display: none;
+      }
+      .btn-cf-orange#btn_copy_base {
+        padding: 7px 10px;
+      }
+
+      /* Clean mobile background (keep dot grid, hide hard boundary vertical lines) */
+      .cf-bg-line-1200-left,
+      .cf-bg-line-1200-right {
+        display: none;
+      }
+
+      /* Pipeline mobile stacking */
+      .cf-pipeline-card {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 14px 16px;
+        gap: 12px;
+      }
+      .pipeline-steps {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .pipe-step {
+        width: 100%;
+        justify-content: flex-start;
+        padding: 6px 12px;
+        font-size: 12px;
+      }
+      .pipe-arrow {
+        display: none;
+      }
+    }
+
+    /* MOBILE PHONES (<= 560px) */
+    @media (max-width: 560px) {
+      .cf-container {
+        padding: 0 14px 36px;
+      }
+
+      /* Console Switcher compact layout */
+      .cf-switcher-wrap {
+        margin-bottom: 20px;
+        padding: 0;
+      }
+      .cf-switcher {
+        width: 100%;
+        display: flex;
+        padding: 3px;
+        gap: 3px;
+      }
+      .cf-switch-btn {
+        flex: 1;
+        justify-content: center;
+        padding: 7px 6px;
+        font-size: 11.5px;
+        gap: 4px;
+      }
+      .cf-switch-btn svg {
+        width: 13px;
+        height: 13px;
+      }
+      .sw-txt-full {
+        display: none;
+      }
+      .sw-txt-short {
+        display: inline;
+      }
+
+      /* Card Header stacking */
+      .cf-card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 12px 14px;
+        gap: 10px;
+      }
+      .cf-card-header-actions {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .cf-pill-tabs {
+        width: 100%;
+        overflow-x: auto;
+        white-space: nowrap;
+        padding-bottom: 2px;
+        -webkit-overflow-scrolling: touch;
+      }
+      .cf-pill-tab {
+        flex-shrink: 0;
+        padding: 4px 8px;
+        font-size: 11px;
+      }
+      .cf-card-body {
+        padding: 14px;
+        gap: 14px;
+      }
+
+      /* Inputs touch comfort */
+      input[type="text"], input[type="number"], select, textarea {
+        font-size: 13px;
+        padding: 9px 11px;
+      }
+
+      /* Proof strip card */
+      .cf-proof-logos {
+        border-radius: 12px;
+        padding: 12px 14px;
+        gap: 10px 14px;
+      }
+
+      /* Terminal mobile adjustments */
+      .cf-terminal {
+        height: 190px;
+        padding: 8px 10px;
+        font-size: 11px;
+      }
+      .term-line {
+        flex-direction: column;
+        gap: 2px;
+      }
+      .term-ts {
+        font-size: 10px;
+      }
+
+      /* Footer */
+      footer.cf-footer {
+        flex-direction: column;
+        text-align: center;
+        gap: 8px;
+        padding: 16px 14px;
+      }
+    }
+
+    /* SMALL PHONES (<= 420px) */
+    @media (max-width: 420px) {
+      .cf-brand-title {
+        font-size: 13.5px;
+      }
+      .cf-logo-svg {
+        width: 28px;
+        height: 20px;
+      }
+      #nav_status_text {
+        display: none;
+      }
+      .cf-status-pill.cf-status-operational {
+        padding: 5px 8px;
+      }
+
+      .metrics-row {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+      }
+      .metric-card {
+        padding: 12px 10px;
+      }
+      .metric-lbl {
+        font-size: 9.5px;
+      }
+      .metric-val {
+        font-size: 20px;
+      }
+      .metric-sub {
+        font-size: 10px;
+      }
+
+      .chip-row {
+        gap: 4px;
+      }
+      .cf-chip {
+        font-size: 10.5px;
+        padding: 3px 8px;
+      }
+
+      .btn-submit-orange {
+        font-size: 13px;
+        padding: 11px 16px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -993,11 +1264,11 @@
     </nav>
 
     <div class="cf-nav-actions">
-      <div class="cf-status-pill">
+      <div class="cf-status-pill cf-status-operational">
         <span class="status-dot"></span>
         <span id="nav_status_text">Operational</span>
       </div>
-      <div class="cf-status-pill" style="font-family:var(--mono);">
+      <div class="cf-status-pill cf-uptime-pill" style="font-family:var(--mono);">
         <span style="color:var(--text-dim)">up:</span>
         <span id="nav_uptime" style="color:#ffffff; font-weight:600;">0s</span>
       </div>
@@ -1174,15 +1445,18 @@
         <div class="cf-switcher">
           <button class="cf-switch-btn active" id="btn_mode_turnstile" onclick="selectMode('turnstile')">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            <span>Turnstile Solver</span>
+            <span class="sw-txt-full">Turnstile Solver</span>
+            <span class="sw-txt-short">Turnstile</span>
           </button>
           <button class="cf-switch-btn" id="btn_mode_iuam" onclick="selectMode('iuam')">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-            <span>IUAM Bypass</span>
+            <span class="sw-txt-full">IUAM Bypass</span>
+            <span class="sw-txt-short">IUAM</span>
           </button>
           <button class="cf-switch-btn" id="btn_mode_raw" onclick="selectMode('raw')">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-            <span>Raw Payload</span>
+            <span class="sw-txt-full">Raw Payload</span>
+            <span class="sw-txt-short">Raw</span>
           </button>
         </div>
       </div>
@@ -1289,7 +1563,7 @@
               <button class="cf-pill-tab" id="tab_node" onclick="selectRightTab('node')">Node.js</button>
               <button class="cf-pill-tab" id="tab_python" onclick="selectRightTab('python')">Python</button>
             </div>
-            <div style="display:flex; align-items:center; gap:8px;">
+            <div class="cf-card-header-actions">
               <span id="elapsed_tag" style="font-size:11px; font-family:var(--mono); color:var(--text-muted)">time: —</span>
               <button class="btn-outline-pill" onclick="copyCurrentViewer()">Copy</button>
             </div>
